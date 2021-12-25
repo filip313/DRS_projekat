@@ -21,7 +21,8 @@ class User(db.Model):
     primljene_transakcije = db.relationship('Transakcija', foreign_keys='Transakcija.primalac_id')
     poslate_transakcije = db.relationship('Transakcija', foreign_keys='Transakcija.posiljalac_id')
 
-    def __init__(self, ime, prezime, adresa, grad, drzava, telefon, email, password, stanja, primljene_transakcije, poslate_transakcije):
+    def __init__(self, ime, prezime, adresa, grad, drzava, telefon, email, password, stanja, primljene_transakcije, poslate_transakcije, id=None):
+        self.id = id
         self.ime = ime
         self.prezime = prezime
         self.adresa = adresa

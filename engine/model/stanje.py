@@ -10,9 +10,8 @@ class Stanje(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
-    def __init__(self, id, valuta, stanje, user_id):
+    def __init__(self, valuta, stanje, user_id):
         self.valuta = valuta
-        self.id = id
         self.user_id = user_id
         self.stanje = stanje
 

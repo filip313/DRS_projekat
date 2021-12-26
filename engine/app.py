@@ -8,7 +8,7 @@ from model.seme import LoginSchema, UbacivanjeSredstavaSchema
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@0.0.0.0/baza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@localhost/baza'
 app.config['SECRET_KEY'] = '123'
 db.init_app(app)
 ma.init_app(app)

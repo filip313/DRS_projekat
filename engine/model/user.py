@@ -21,7 +21,7 @@ class User(db.Model):
     primljene_transakcije = db.relationship('Transakcija', foreign_keys='Transakcija.primalac_id')
     poslate_transakcije = db.relationship('Transakcija', foreign_keys='Transakcija.posiljalac_id')
 
-    def __init__(self, ime, prezime, adresa, grad, drzava, telefon, email, password, stanja, primljene_transakcije, poslate_transakcije, id=None):
+    def __init__(self, ime, prezime, adresa, grad, drzava, telefon, email, password, stanja, primljene_transakcije, poslate_transakcije, id=None, verifikovan=False):
         self.id = id
         self.ime = ime
         self.prezime = prezime
@@ -31,7 +31,7 @@ class User(db.Model):
         self.telefon = telefon
         self.email = email
         self.password = password
-        self.verifikovan = False
+        self.verifikovan = verifikovan 
         self.stanja = stanja
         self.primljene_transakcije = primljene_transakcije
         self.poslate_transakcije = poslate_transakcije
@@ -47,6 +47,7 @@ class UserSchema(Schema):
     telefon =fields.String() 
     email = fields.String()
     password =fields.String()
+    verifikovan = fields.Boolean()
     stanja = fields.List(fields.Nested(StanjeSchema))
     primljene_transakcije = fields.List(fields.Nested(TransakcijaSchema))
     poslate_transakcije = fields.List(fields.Nested(TransakcijaSchema))

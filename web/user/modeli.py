@@ -1,7 +1,7 @@
 from marshmallow import Schema,fields,post_load
 
 class User():
-    def __init__(self,ime,prezime,adresa,grad,drzava,telefon,email,password,verifikovan=False,stanja=[],primljene_transakcije=[],poslate_transakcije=[],id=None):
+    def __init__(self,ime,prezime,adresa,grad,drzava,telefon,email,password,verifikovan=False,stanja=[],primljene_transakcije=[],poslate_transakcije=[],id=-1):
         self.id=id
         self.ime=ime
         self.prezime=prezime
@@ -27,9 +27,9 @@ class UserSchema(Schema):
     email=fields.Email()
     password=fields.String()
     verifikovan=fields.Boolean()
-    stanja=fields.List()
-    primljene_transakcije=fields.List()
-    poslate_transakcije=fields.List()
+    stanja=fields.List(fields.Number())
+    primljene_transakcije=fields.List(fields.Number())
+    poslate_transakcije=fields.List(fields.Number())
 
     @post_load
     def make_user(self,data,**kwargs):

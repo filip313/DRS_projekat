@@ -4,7 +4,7 @@ from user.controler import user
 
 app=Flask(__name__)
 app.register_blueprint(user,url_prefix="/user")
-
+app.config['SECRET_KEY'] = 'asdfasdfasdfsadf'
 
 
 @app.route("/")

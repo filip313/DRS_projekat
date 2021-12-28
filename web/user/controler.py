@@ -1,7 +1,9 @@
+from werkzeug.utils import redirect
 from user import *
-from user.forme import RegisterForm
-from user.modeli import UserSchema,User
+from user.forme import LoginForm, RegisterForm
+from user.modeli import UserSchema,User,LoginSchema
 from urllib import request as req, parse 
+import json
 
 @user.route("/register",methods=["GET","POST"])
 
@@ -26,3 +28,31 @@ def register():
             return render_template('register.html', form=form)
     else :
         return render_template('register.html', form=form)
+
+
+@user.route("/login", methods=["GET","POST"])
+
+def login():
+    form=LoginForm()
+    if request.method=="POST":
+        if form.validate_on_submit():
+            logovanje=LoginSchema().load({"email":form.email.data,"password":form.password.data})
+            data = jsonify(logovanje).get_data()
+            zahtev = req.Request("http://localhost:5000/login")
+            zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
+            zahtev.add_header('Content-Length', len(data))
+            ret = req.urlopen(zahtev, data)
+            user=json.loads(ret.read())
+            session["user"]=user
+            
+            return redirect(url_for("index"))
+        if form.errors != {}:
+            for msg in form.errors.values():
+                flash(msg.pop(), category='danger')
+
+            return render_template('login.html', form=form)
+    else :
+        return render_template('login.html', form=form)
+            
+
+

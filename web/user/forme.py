@@ -23,3 +23,9 @@ class RegisterForm(FlaskForm):
             return True
         else:
             raise ValidationError('Format broja telefona nije ispravan!')
+
+
+class LoginForm(FlaskForm):
+    email = StringField(label='Email: ', validators=[Email('Email nije ispravan!'),DataRequired()])
+    password = PasswordField(label='Sifra: ', validators=[Length(min=6),DataRequired()])
+    submit = SubmitField(label='Uloguj se')

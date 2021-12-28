@@ -1,0 +1,18 @@
+{% extends 'template.html' %}
+{% block title%}
+Logovanje
+{% endblock %}
+{% block content %}
+<body>
+    <form method="POST" class="form-login">
+        {{ form.hidden_tag() }}
+        {{ form.email.label() }}
+        {{ form.email(class="form-control", placeholder="Email")}}
+        <br>
+        {{ form.password.label() }}
+        {{ form.password(class="form-control", placeholder="")}}
+        <br>      
+        {{ form.submit() }}
+    </form>
+</body>
+{% endblock %}

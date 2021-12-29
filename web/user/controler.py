@@ -4,6 +4,7 @@ from user.forme import LoginForm, RegisterForm
 from user.modeli import UserSchema,User,LoginSchema
 from urllib import request as req, parse 
 import json
+from urllib.error import HTTPError
 
 @user.route("/register",methods=["GET","POST"])
 
@@ -18,8 +19,15 @@ def register():
             zahtev = req.Request("http://localhost:5000/register")
             zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
             zahtev.add_header('Content-Length', len(data))
-            ret = req.urlopen(zahtev, data)
-            return ret.read() 
+            try:
+                ret = req.urlopen(zahtev, data)
+            except HTTPError as e:
+                flash(e.read().decode(),category='danger')
+                return render_template("register.html",form=form)
+            
+            flash(ret.read().decode(),category='primary')
+            return redirect(url_for("user.login"))
+            
         
         if form.errors != {}:
             for msg in form.errors.values():
@@ -41,10 +49,15 @@ def login():
             zahtev = req.Request("http://localhost:5000/login")
             zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
             zahtev.add_header('Content-Length', len(data))
-            ret = req.urlopen(zahtev, data)
+            try:
+                ret = req.urlopen(zahtev, data)
+            except HTTPError as e:
+                 flash(e.read().decode(),category='danger')
+                 return render_template("login.html",form=form)
+
             user=json.loads(ret.read())
             session["user"]=user
-            
+            flash(f"Uspesno ste ulogovani kao {user['ime']}",category='primary')
             return redirect(url_for("index"))
         if form.errors != {}:
             for msg in form.errors.values():
@@ -53,6 +66,17 @@ def login():
             return render_template('login.html', form=form)
     else :
         return render_template('login.html', form=form)
-            
+
+
+@user.route("/logout", methods=["GET"])
+
+def logout():
+    if "user" in session:
+        session.pop("user") 
+        flash("Korisnik uspesno izlogovan!", category='primary')
+    
+        
+    return redirect(url_for("index"))
+
 
 

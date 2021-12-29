@@ -11,8 +11,11 @@ app.config['SECRET_KEY'] = 'asdfasdfasdfsadf'
 @app.route("/")
 
 def index():
-    user=session["user"]
-    return user["ime"]
+    if "user" in session:
+        user=session["user"]
+        return user["ime"]
+    else:
+        return "index"
 
 if __name__=="__main__":
     app.run(debug=True,port=5001)

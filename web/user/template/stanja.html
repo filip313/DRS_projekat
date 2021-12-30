@@ -1,0 +1,24 @@
+{% extends 'template.html' %}
+{% block title%}
+Uvid stanja
+{% endblock %}
+{% block content %}
+<body>
+    <table>
+        <thead>
+            <th>Id</th>
+            <th>Valuta</th>
+            <th>Stanje</th>
+        </thead>
+        <tbody>
+            {% for stanje in stanja %}
+                <tr>
+                    <td>{{ stanje['id'] }}</td>
+                    <td>{{ stanje['valuta'] }}</td>
+                    <td>{{ stanje['stanje'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+{% endblock %}

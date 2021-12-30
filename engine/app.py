@@ -49,7 +49,7 @@ def login():
     return 'Nepostojeci korisnik', 404
 
 
-@app.route('/change_user', methods=['PUT'])
+@app.route('/change_user', methods=['POST'])
 def change_user():
     user = UserSchema().load(request.get_json())
     db_user = User.query.filter_by(id=user.id , email=user.email).first()
@@ -62,15 +62,17 @@ def change_user():
             db_user.drzava = user.drzava
             db_user.telefon = user.telefon
             db_user.adresa = user.adresa
-            db_user.password = user.password
+            if user.password != "":
+                db_user.password = user.password
             db.session.commit()
-            return 'User izmenjen', 200
+            user.password = ""
+            return jsonify(UserSchema().dump(user)), 200
         except Exception:
             return 'Nemoguce izmeniti korisnika', 406
     
     return 'Korisnik ne postoji', 404
     
-@app.route('/uplata_sredstava', methods=['PUT'])
+@app.route('/uplata_sredstava', methods=['POST'])
 def uplata_sredstava():
     data = UbacivanjeSredstavaSchema().load(request.get_json())
     email = data["email"]

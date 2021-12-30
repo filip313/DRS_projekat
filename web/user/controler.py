@@ -1,6 +1,6 @@
 from werkzeug.utils import redirect
 from user import *
-from user.forme import LoginForm, RegisterForm
+from user.forme import LoginForm, RegisterForm, ChangeForm
 from user.modeli import UserSchema,User,LoginSchema
 from urllib import request as req, parse 
 import json
@@ -80,3 +80,53 @@ def logout():
 
 
 
+@user.route('/change', methods=['GET', 'POST'])
+def change_user():
+    form = ChangeForm()
+    if 'user' in session:
+        if request.method == "POST":
+            if form.validate_on_submit():
+                user=User(form.ime.data,form.prezime.data,form.adresa.data,form.grad.data,form.drzava.data,form.telefon.data,form.email.data,form.password1.data)
+                user.email = session['user']['email'] 
+                user.id = session['user']['id']
+                data=UserSchema().dump(user)
+                data = jsonify(data).get_data()
+                zahtev = req.Request("http://localhost:5000/change_user")
+                zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
+                zahtev.add_header('Content-Length', len(data))
+                try:
+                    ret = req.urlopen(zahtev, data)
+                except HTTPError as e:
+                    flash(e.read().decode(),category='danger')
+                    return render_template('change.html', form=form)
+
+                user=json.loads(ret.read())
+                session["user"]=user
+                flash(f"Uspesno ste promenili korisnicke podatke! ",category='primary')
+                return redirect(url_for("index"))
+            if form.errors != {}:
+                for msg in form.errors.values():
+                    flash(msg.pop(), category='danger')
+
+                return render_template('change.html', form=form)
+        if request.method == 'GET':
+            user = session['user']
+            form.ime.data = user['ime']
+            form.prezime.data = user['prezime']
+            form.grad.data = user['grad']
+            form.adresa.data = user['adresa']
+            form.drzava.data = user['drzava']
+            form.telefon.data = user['telefon']
+            form.email.data = user['email']
+
+            return render_template('change.html', form=form)
+
+    else:
+        return redirect(url_for('user.login'))
+
+@user.route('/stanja', methods=['GET'])
+def stanja():
+    if 'user' in session:
+        return render_template('stanja.html', stanja=session['user']['stanja'])
+    else:
+        return redirect(url_for('user.login'))

@@ -1,0 +1,40 @@
+{% extends 'template.html' %}
+{% block title%}
+Promena Podataka
+{% endblock %}
+{% block content %}
+<body>
+    <form method="POST" class="form-change">
+        {{ form.hidden_tag() }}
+        {{ form.ime.label() }}
+        {{ form.ime(class="form-control", placeholder="Ime")}}
+        <br>
+        {{ form.prezime.label() }}
+        {{ form.prezime(class="form-control", placeholder="Prezime")}}
+        <br>
+        {{ form.adresa.label() }}
+        {{ form.adresa(class="form-control", placeholder="Adresa")}}
+        <br>
+        {{ form.grad.label() }}
+        {{ form.grad(class="form-control", placeholder="Grad")}}
+        <br>
+        {{ form.drzava.label() }}
+        {{ form.drzava(class="form-control", placeholder="Drzava")}}
+        <br>
+        {{ form.telefon.label() }}
+        {{ form.telefon(class="form-control", placeholder="06xxxxxxx")}}
+        <br>
+        {{ form.email.label() }}
+        {{ form.email(class="form-control", placeholder="Email")}}
+        <br>
+        {{ form.password1.label() }}
+        {{ form.password1(class="form-control", placeholder="")}}
+        <br>
+        {{ form.password2.label() }}
+        {{ form.password2(class="form-control", placeholder="")}}
+        <br>
+
+        {{ form.submit() }}
+    </form>
+</body>
+{% endblock %}

@@ -4,7 +4,9 @@ class LoginSchema(Schema):
     email = fields.Email()
     password = fields.String()
 
-class UbacivanjeSredstavaSchema(Schema):
+class VerifikacijaSchema(Schema):
     email = fields.Email()
-    id = fields.Number()
-    vrednost = fields.Number()
+    brojKartice=fields.String()
+    ime=fields.String()
+    datumIsteka=fields.String()
+    kod = fields.String()

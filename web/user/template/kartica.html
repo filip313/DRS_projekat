@@ -1,0 +1,24 @@
+{% extends 'template.html' %}
+{% block title%}
+Verifikacija kartice
+{% endblock %}
+{% block content %}
+<body>
+    <form method="POST" class="form-Kartica">
+        {{ form.hidden_tag() }}
+        {{ form.ime.label() }}
+        {{ form.ime(class="form-control")}}
+        <br>
+        {{ form.brojKartice.label() }}
+        {{ form.brojKartice(class="form-control", placeholder="")}}
+        <br>    
+        {{ form.datumIsteka.label() }}
+        {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
+        <br>
+        {{ form.kod.label() }}
+        {{ form.kod(class="form-control", placeholder="")}}
+        <br>
+        {{ form.submit() }}
+    </form>
+</body>
+{% endblock %}

@@ -13,7 +13,7 @@ app.config['SECRET_KEY'] = 'asdfasdfasdfsadf'
 def index():
     if "user" in session:
         user=session["user"]
-        return user['stanja'][0]['valuta']
+        return str(user['verifikovan'])
     else:
         return "index"
 

@@ -4,8 +4,8 @@ from model import db, ma
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema
-from model.seme import LoginSchema, UbacivanjeSredstavaSchema 
-
+from model.seme import LoginSchema, VerifikacijaSchema 
+import datetime
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@localhost/baza'
@@ -71,36 +71,32 @@ def change_user():
             return 'Nemoguce izmeniti korisnika', 406
     
     return 'Korisnik ne postoji', 404
+
+def verifikacija_kartice(user,data):
+    if user.ime==data["ime"]:
+        if data["brojKartice"]== "4242424242424242":
+            datum=data["datumIsteka"]
+            datumisteka=datum.split('/')
+            datumnovi=datetime.datetime.now()
+            if int(datumisteka[0])>datumnovi.date().month and int("20" + datumisteka[1])>=datumnovi.date().year:
+                if data["kod"]=='123':
+                    return True
+    return False
     
-@app.route('/uplata_sredstava', methods=['POST'])
-def uplata_sredstava():
-    data = UbacivanjeSredstavaSchema().load(request.get_json())
+@app.route('/verifikacija', methods=['POST'])
+def verifikacija():
+    data = VerifikacijaSchema().load(request.get_json())
     email = data["email"]
-    id = data["id"]
-    vrednost = data["vrednost"]
-    user = User.query.filter_by(id=id, email=email).first()
+    user = User.query.filter_by(email=email).first()
     if user:
-        if user.verifikovan:
-            stanje = None
-            for s in user.stanja:
-                if s.valuta == "USD":
-                    stanje = s
-                    break
-
-            if stanje:
-                try:
-                    stanje.stanje+= vrednost
-                    db.session.commit()
-                except Exception:
-                    return "Doslo je do greske", 500
-
-                return jsonify(StanjeSchema().dump(stanje)), 200
-            else:
-                return "Izmena stanja neuspela", 404
+        if verifikacija_kartice(user,data):
+            user.verifikovan=True
+            db.session.commit()
+            return "Korisnik uspesno verifikovan"
         else:
-            return "User nije verifikovan", 401
+            return "Kartica nije verifikovana,pokusajte opet!",403
+            
     else:
-
         return "User ne postoji", 404
 
 

@@ -1,4 +1,3 @@
-from werkzeug.utils import redirect
 from user import *
 from user.forme import KarticaForm, LoginForm, RegisterForm, ChangeForm
 from user.modeli import UserSchema,User,LoginSchema
@@ -144,6 +143,7 @@ def verifikacija():
                 zahtev.add_header('Content-Length', len(data))
                 try:
                     ret = req.urlopen(zahtev, data)
+                    session['user']['verifikovan']=True
 
                 except HTTPError as e:
                     flash(e.read().decode(),category='danger')

@@ -1,0 +1,27 @@
+{% extends 'template.html' %}
+{% block title%}
+Uplata
+{% endblock %}
+{% block content %}
+<body>
+    <form method="POST" class="form-Uplata">
+        {{ form.hidden_tag() }}
+        {{ form.ime.label() }}
+        {{ form.ime(class="form-control")}}
+        <br>
+        {{ form.brojKartice.label() }}
+        {{ form.brojKartice(class="form-control", placeholder="")}}
+        <br>    
+        {{ form.datumIsteka.label() }}
+        {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
+        <br>
+        {{ form.kod.label() }}
+        {{ form.kod(class="form-control", placeholder="")}}
+        <br>
+        {{ form.stanje.label() }}
+        {{ form.stanje(class="form-control", placeholder="")}}
+        <br>
+        {{ form.submit() }}
+    </form>
+</body>
+{% endblock %}

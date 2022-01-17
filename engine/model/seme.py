@@ -10,3 +10,6 @@ class VerifikacijaSchema(Schema):
     ime=fields.String()
     datumIsteka=fields.String()
     kod = fields.String()
+
+class UplataSchema(VerifikacijaSchema):
+    stanje=fields.Number()

@@ -4,7 +4,7 @@ from model import db, ma
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema
-from model.seme import LoginSchema, VerifikacijaSchema 
+from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema 
 import datetime
 app = Flask(__name__)
 
@@ -98,6 +98,28 @@ def verifikacija():
             
     else:
         return "User ne postoji", 404
+
+@app.route("/uplata",methods=['POST'])
+def uplata():
+    data=UplataSchema().load(request.get_json())
+    email=data['email']
+    user=User.query.filter_by(email=email).first()
+    if user and user.verifikovan:
+        if verifikacija_kartice(user,data):
+            kraj=True
+            for stanje in user.stanja:
+                if stanje.valuta== "USD":
+                    stanje.stanje+=data['stanje']
+                    kraj =False
+            if kraj:
+                stanje=Stanje(valuta="USD",stanje=data['stanje'])
+                user.stanja.append(stanje)
+            db.session.commit()
+            return jsonify(StanjeSchema(many=True).dump(user.stanja))
+        else:
+            return "Podaci o kartici nisu ispravni!",403
+    else:
+        return "Korisnik ne postoji ili nije verifikovan!",404
 
 
 ## privremene metode

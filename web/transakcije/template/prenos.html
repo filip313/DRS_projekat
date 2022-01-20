@@ -1,0 +1,21 @@
+{% extends 'template.html' %}
+{% block title%}
+Prenos
+{% endblock %}
+{% block content %}
+<body>
+    <form method="POST" class="form-prenos">
+        {{ form.hidden_tag() }}
+        {{ form.primalac.label() }}
+        {{ form.primalac(class="form-control")}}
+        <br>
+        {{ form.valuta.label() }}
+        {{ form.valuta(class="form-control", placeholder="")}}
+        <br>    
+        {{ form.iznos.label() }}
+        {{ form.iznos(class="form-control", placeholder="")}}
+        <br>
+        {{ form.submit() }}
+    </form>
+</body>
+{% endblock %}

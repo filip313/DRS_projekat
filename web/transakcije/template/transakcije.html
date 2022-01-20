@@ -1,0 +1,60 @@
+{% extends 'template.html' %}
+{% block title%}
+Transakcije
+{% endblock %}
+{% block content %}
+<body>
+    <p>
+        <h1>Poslate</h1>
+        <br>
+        <table style="border:1px solid black;">
+            <thead>
+                    <th>Hash</th>
+                    <th>Valuta</th>
+                    <th>Iznos</th>
+                    <th>Provizija</th>
+                    <th>Status</th>
+                    <th>Primalac Id</th>
+            </thead>
+            <tbody>
+                {% for t in poslate %}
+                    <tr style="border:1px solid black">
+                        <td>{{ t['hash_id'] }}</td>
+                        <td>{{ t['valuta'] }}</td>
+                        <td>{{ t['iznos'] }}</td>
+                        <td>{{ t['provizija'] }}</td>
+                        <td>{{ t['stanje'] }}</td>
+                        <td>{{ t['primalac_id'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
+    <p>
+        <h1>Primljene</h1>
+        <br>
+        <table>
+            <thead>
+                    <th>Hash</th>
+                    <th>Valuta</th>
+                    <th>Iznos</th>
+                    <th>Provizija</th>
+                    <th>Status</th>
+                    <th>Posiljalac Id</th>
+            </thead>
+            <tbody>
+                {% for t in primljene %}
+                    <tr>
+                        <td>{{ t['hash_id'] }}</td>
+                        <td>{{ t['valuta'] }}</td>
+                        <td>{{ t['iznos'] }}</td>
+                        <td>{{ t['provizija'] }}</td>
+                        <td>{{ t['stanje'] }}</td>
+                        <td>{{ t['posiljalac_id'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
+</body>
+{% endblock %}

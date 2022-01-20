@@ -13,3 +13,9 @@ class VerifikacijaSchema(Schema):
 
 class UplataSchema(VerifikacijaSchema):
     stanje=fields.Number()
+
+class TransakcijaSchemaReq(Schema):
+    posiljalac = fields.Email()
+    primalac = fields.Email()
+    valuta = fields.String()
+    iznos = fields.Number()

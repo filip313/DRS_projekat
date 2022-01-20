@@ -1,11 +1,15 @@
-from re import I, S
 from flask import Flask, jsonify, request
-from model import db, ma
+from model import db, ma, SQLAlchemy
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
-from model.transakcija import Transakcija, TransakcijaSchema
-from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema 
+from model.transakcija import Transakcija, TransakcijaSchema, StanjeTransakcije
+from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq
 import datetime
+from time import sleep
+import threading
+from multiprocessing import Process, Queue, Pipe
+from sha3 import keccak_256
+from random import random 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@localhost/baza'
@@ -23,6 +27,7 @@ def index():
 @app.route('/register', methods=['POST'])
 def register():
     user = UserSchema().load(request.get_json())
+    user.stanja.append(Stanje("USD", 0, None))
     try:
         db.session.add(user)
         db.session.commit()
@@ -121,6 +126,71 @@ def uplata():
     else:
         return "Korisnik ne postoji ili nije verifikovan!",404
 
+@app.route('/prenos', methods=['POST'])
+def prenos():
+    data = TransakcijaSchemaReq().load(request.get_json())
+    if data["valuta"] == "RSD":
+        return "Ne vazeca valuta!", 400
+    if data['posiljalac'] == data['primalac']:
+        return 'Nije moguce izvrsiti prenos samom sebi!', 400
+
+    posiljalac = User.query.filter_by(email=data['posiljalac']).first()
+    primalac = User.query.filter_by(email=data['primalac']).first()
+    if posiljalac and posiljalac.verifikovan and primalac and primalac.verifikovan: 
+        transakcija = Transakcija(posiljalac.id, primalac.id, data['iznos'],data['iznos'] * 0.05, data['valuta'], "", StanjeTransakcije.OBRADA)
+        db.session.add(transakcija)
+        db.session.commit()
+        p = threading.Thread(target=obrada_transakcija, args=(posiljalac.email, primalac.email, transakcija.id))
+        p.start()
+        return "Transakcija uspesno zapoceta!", 201
+    else:
+        return 'Doslo je do greske proverite ispravnost email-a!', 400
+
+def obrada_transakcija(pos_em, prim_em, t_id):
+    with app.app_context():
+        sleep(5)
+        posiljalac = User.query.filter_by(email=pos_em).first()
+        primalac = User.query.filter_by(email=prim_em).first()
+        transakcija = Transakcija.query.filter_by(id=t_id).first()
+        str_za_hash = posiljalac.email + primalac.email + str(transakcija.iznos) + str(random())
+        k = keccak_256()
+        k.update(bytes(str_za_hash, 'utf-8'))
+        transakcija.hash_id = k.hexdigest()
+        stanje = None
+        for s in posiljalac.stanja:
+            if s.valuta == transakcija.valuta:
+                stanje = s
+                break
+            
+        if stanje:
+
+            if stanje.stanje >= (transakcija.iznos + transakcija.provizija):
+                transakcija.stanje = StanjeTransakcije.OBRADJENO
+                stanje.stanje -= (transakcija.iznos + transakcija.provizija)
+                kraj = True 
+                for s in primalac.stanja:
+                    if s.valuta == transakcija.valuta:
+                        s.stanje += transakcija.iznos
+                        kraj = False
+                
+                if kraj:
+                    primalac.stanja.append(Stanje(transakcija.valuta, transakcija.iznos, primalac.id))
+            else:
+                transakcija.stanje = StanjeTransakcije.ODBIJENO
+        else:
+            transakcija.stanje = StanjeTransakcije.ODBIJENO 
+
+        db.session.commit()
+
+
+@app.route('/transakcije/<user_id>', methods=['GET'])
+def get_sve_transakcije(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user:
+        user.password = ""
+        return jsonify(UserSchema().dump(user))
+    else:
+        return "Trazeni korisnik ne postoji", 400
 
 ## privremene metode
 @app.route('/dodaj_usera', methods=['POST'])
@@ -153,5 +223,9 @@ def create_all():
     db.create_all()
     return 'napravio nove tabele'
 
+@app.route('/asdf')
+def get_transakcije():
+    tr = Transakcija.query.all()
+    return tr[1].hash_id
 if __name__ == "__main__":
     app.run(debug=True)

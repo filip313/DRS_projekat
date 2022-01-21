@@ -29,6 +29,19 @@ Transakcije
                 {% endfor %}
             </tbody>
         </table>
+        <form method="POST">
+            {{ form_po.hidden_tag() }}
+            {{ form_po.valuta.label() }}
+            {{ form_po.valuta(class="form-control")}}
+            <br>
+            {{ form_po.stanje.label() }}
+            {{ form_po.stanje(class="form-control", placeholder="")}}
+            <br>    
+            {{ form_po.email.label() }}
+            {{ form_po.email(class="form-control", placeholder="")}}
+            <br>
+            {{ form_po.submit1() }}
+        </form>
     </p>
     <p>
         <h1>Primljene</h1>
@@ -55,18 +68,18 @@ Transakcije
                 {% endfor %}
             </tbody>
         </table>
-        <form method="POST" class="form-Pretraga">
-            {{ form.hidden_tag() }}
-            {{ form.valuta.label() }}
-            {{ form.valuta(class="form-control")}}
+        <form method="POST">
+            {{ form_pr.hidden_tag() }}
+            {{ form_pr.valuta.label() }}
+            {{ form_pr.valuta(class="form-control")}}
             <br>
-            {{ form.stanje.label() }}
-            {{ form.stanje(class="form-control", placeholder="")}}
+            {{ form_pr.stanje.label() }}
+            {{ form_pr.stanje(class="form-control", placeholder="")}}
             <br>    
-            {{ form.email.label() }}
-            {{ form.email(class="form-control", placeholder="")}}
+            {{ form_pr.email.label() }}
+            {{ form_pr.email(class="form-control", placeholder="")}}
             <br>
-            {{ form.submit() }}
+            {{ form_pr.submit2() }}
         </form>
     </p>
 </body>

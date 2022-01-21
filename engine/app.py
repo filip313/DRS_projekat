@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from model import db, ma, SQLAlchemy
+from model import db, ma, pc, cc 
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema, StanjeTransakcije
@@ -7,7 +7,7 @@ from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, Transakcij
 import datetime
 from time import sleep
 import threading
-from multiprocessing import Process, Queue, Pipe
+from multiprocessing import Process
 from sha3 import keccak_256
 from random import random 
 app = Flask(__name__)
@@ -27,7 +27,7 @@ def index():
 @app.route('/register', methods=['POST'])
 def register():
     user = UserSchema().load(request.get_json())
-    user.stanja.append(Stanje("USD", 0, None))
+    user.stanja.append(Stanje("USD", 0, None, None))
     try:
         db.session.add(user)
         db.session.commit()
@@ -137,7 +137,7 @@ def prenos():
     posiljalac = User.query.filter_by(email=data['posiljalac']).first()
     primalac = User.query.filter_by(email=data['primalac']).first()
     if posiljalac and posiljalac.verifikovan and primalac and primalac.verifikovan: 
-        transakcija = Transakcija(posiljalac.id, primalac.id, data['iznos'],data['iznos'] * 0.05, data['valuta'], "", StanjeTransakcije.OBRADA)
+        transakcija = Transakcija(posiljalac.id, primalac.id, data['iznos'],data['iznos'] * 0.05, data['valuta'], "", StanjeTransakcije.OBRADA, None)
         db.session.add(transakcija)
         db.session.commit()
         p = threading.Thread(target=obrada_transakcija, args=(posiljalac.email, primalac.email, transakcija.id))
@@ -148,38 +148,31 @@ def prenos():
 
 def obrada_transakcija(pos_em, prim_em, t_id):
     with app.app_context():
-        sleep(5)
         posiljalac = User.query.filter_by(email=pos_em).first()
         primalac = User.query.filter_by(email=prim_em).first()
         transakcija = Transakcija.query.filter_by(id=t_id).first()
-        str_za_hash = posiljalac.email + primalac.email + str(transakcija.iznos) + str(random())
-        k = keccak_256()
-        k.update(bytes(str_za_hash, 'utf-8'))
-        transakcija.hash_id = k.hexdigest()
-        stanje = None
+        pc.send(UserSchema().dump(posiljalac))
+        pc.send(UserSchema().dump(primalac))
+        pc.send(TransakcijaSchema().dump(transakcija)) 
+        pos_stanje= StanjeSchema().load(pc.recv())
+        prim_stanje = StanjeSchema().load(pc.recv())
+        t= TransakcijaSchema().load(pc.recv())
+        transakcija.hash_id = t.hash_id
+        transakcija.stanje = t.stanje
+        kraj = True
         for s in posiljalac.stanja:
-            if s.valuta == transakcija.valuta:
-                stanje = s
-                break
-            
-        if stanje:
-
-            if stanje.stanje >= (transakcija.iznos + transakcija.provizija):
-                transakcija.stanje = StanjeTransakcije.OBRADJENO
-                stanje.stanje -= (transakcija.iznos + transakcija.provizija)
-                kraj = True 
-                for s in primalac.stanja:
-                    if s.valuta == transakcija.valuta:
-                        s.stanje += transakcija.iznos
-                        kraj = False
-                
-                if kraj:
-                    primalac.stanja.append(Stanje(transakcija.valuta, transakcija.iznos, primalac.id))
-            else:
-                transakcija.stanje = StanjeTransakcije.ODBIJENO
-        else:
-            transakcija.stanje = StanjeTransakcije.ODBIJENO 
-
+            if s.valuta == pos_stanje.valuta:
+                s.stanje = pos_stanje.stanje
+                kraj = False
+        if kraj:
+            posiljalac.stanja.append(pos_stanje)
+        kraj = True
+        for s in primalac.stanja:
+            if s.valuta == prim_stanje.valuta:
+                s.stanje = prim_stanje.stanje
+                kraj = False
+        if kraj:
+            primalac.stanja.append(prim_stanje)
         db.session.commit()
 
 
@@ -227,5 +220,49 @@ def create_all():
 def get_transakcije():
     tr = Transakcija.query.all()
     return tr[1].hash_id
+
+def proces_transakcija(cc):
+    while True:
+        posiljalac = cc.recv()
+        primalac = cc.recv()
+        transakcija = cc.recv()
+        sleep(5)
+        str_za_hash = posiljalac['email'] + primalac['email'] + str(transakcija['iznos']) + str(random())
+        k = keccak_256()
+        k.update(bytes(str_za_hash, 'utf-8'))
+        transakcija['hash_id'] = k.hexdigest()
+        stanje = None
+        for s in posiljalac['stanja']:
+            if s['valuta'] == transakcija['valuta']:
+                stanje = s
+                break
+            
+        if stanje:
+
+            if stanje['stanje'] >= (transakcija['iznos'] + transakcija['provizija']):
+                transakcija['stanje'] = "OBRADJENO" 
+                stanje['stanje'] -= (transakcija['iznos'] + transakcija['provizija'])
+                cc.send(stanje)
+                kraj = True 
+                for s in primalac['stanja']:
+                    if s['valuta'] == transakcija['valuta']:
+                        s['stanje'] += transakcija['iznos']
+                        cc.send(stanje)
+                        kraj = False
+                
+                if kraj:
+                    novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=0)
+                    cc.send(StanjeSchema().dump(novo_stanje))
+                    primalac['stanja'].append(novo_stanje)
+            else:
+                transakcija['stanje'] = "ODBIJENO"
+        else:
+            transakcija['stanje'] = "ODBIJENO"
+
+        cc.send(transakcija)
+    
+
 if __name__ == "__main__":
+    p = Process(target=proces_transakcija, args=(cc,))
+    p.start()
     app.run(debug=True)

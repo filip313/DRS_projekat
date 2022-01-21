@@ -56,8 +56,8 @@ def prenos():
                 zahtev.add_header('Content-Length', len(data))
                 try:
                     ret = req.urlopen(zahtev, data)
-                    flash(json.loads(ret.read()), category='primary')
-                    return redirect(url_for('index'))
+                    flash(ret.read().decode(), category='primary')
+                    return redirect(url_for('transakcije.prikaz_transakcija'))
                 except HTTPError as e:
                     flash(e.read().decode(), category='danger')
                     return render_template('prenos.html', form=form)

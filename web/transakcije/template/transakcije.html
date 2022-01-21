@@ -14,7 +14,7 @@ Transakcije
                     <th>Iznos</th>
                     <th>Provizija</th>
                     <th>Status</th>
-                    <th>Primalac Id</th>
+                    <th>Primalac </th>
             </thead>
             <tbody>
                 {% for t in poslate %}
@@ -40,7 +40,7 @@ Transakcije
                     <th>Iznos</th>
                     <th>Provizija</th>
                     <th>Status</th>
-                    <th>Posiljalac Id</th>
+                    <th>Posiljalac </th>
             </thead>
             <tbody>
                 {% for t in primljene %}
@@ -55,6 +55,19 @@ Transakcije
                 {% endfor %}
             </tbody>
         </table>
+        <form method="POST" class="form-Pretraga">
+            {{ form.hidden_tag() }}
+            {{ form.valuta.label() }}
+            {{ form.valuta(class="form-control")}}
+            <br>
+            {{ form.stanje.label() }}
+            {{ form.stanje(class="form-control", placeholder="")}}
+            <br>    
+            {{ form.email.label() }}
+            {{ form.email(class="form-control", placeholder="")}}
+            <br>
+            {{ form.submit() }}
+        </form>
     </p>
 </body>
 {% endblock %}

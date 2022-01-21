@@ -1,7 +1,5 @@
-from nis import cat
-from re import L
 from transakcije import *
-from transakcije.forme import UplataForm, PrenosForm
+from transakcije.forme import UplataForm, PrenosForm,PretragaForm
 from urllib import request as req
 from urllib.error import HTTPError
 import json
@@ -72,17 +70,29 @@ def prenos():
         redirect(url_for('user.login'))
 
     
-@transakcije.route('/prikaz', methods=['GET'])
+@transakcije.route('/prikaz', methods=['GET','POST'])
 def prikaz_transakcija():
     if 'user' in session:
+        primljene_form=PretragaForm()
+        poslate_form=PretragaForm()
+        
+
         try:
             ret = req.urlopen(f'http://localhost:5000/transakcije/{session["user"]["id"]}')
             user = json.loads(ret.read())
             session['user'] = user
-            return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'])
+            izbor=[]
+            for t in user["primljene_transakcije"]:
+                izbor.append((t['valuta'],t['valuta']))
+
+            primljene_form.valuta.choices=izbor
+            
+            
+            return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'],form=primljene_form)
         except HTTPError as e:
             flash(e.read().decode(), category='danger')
             return redirect(url_for('index'))
 
     else:
         return redirect(url_for('user.login'))
+

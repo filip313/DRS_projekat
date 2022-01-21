@@ -159,20 +159,22 @@ def obrada_transakcija(pos_em, prim_em, t_id):
         t= TransakcijaSchema().load(pc.recv())
         transakcija.hash_id = t.hash_id
         transakcija.stanje = t.stanje
-        kraj = True
-        for s in posiljalac.stanja:
-            if s.valuta == pos_stanje.valuta:
-                s.stanje = pos_stanje.stanje
-                kraj = False
-        if kraj:
-            posiljalac.stanja.append(pos_stanje)
-        kraj = True
-        for s in primalac.stanja:
-            if s.valuta == prim_stanje.valuta:
-                s.stanje = prim_stanje.stanje
-                kraj = False
-        if kraj:
-            primalac.stanja.append(prim_stanje)
+        if pos_stanje.id != -1:
+            kraj = True
+            for s in posiljalac.stanja:
+                if s.valuta == pos_stanje.valuta:
+                    s.stanje = pos_stanje.stanje
+                    kraj = False
+            if kraj:
+                posiljalac.stanja.append(pos_stanje)
+        if prim_stanje.id != -1:
+            kraj = True
+            for s in primalac.stanja:
+                if s.valuta == prim_stanje.valuta:
+                    s.stanje = prim_stanje.stanje
+                    kraj = False
+            if kraj:
+                primalac.stanja.append(prim_stanje)
         db.session.commit()
 
 
@@ -181,9 +183,29 @@ def get_sve_transakcije(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user:
         user.password = ""
-        return jsonify(UserSchema().dump(user))
+        user=UserSchema().dump(user)
+        t1=threading.Thread(target=pribavi_email,args=(user["poslate_transakcije"],True))
+        t2=threading.Thread(target=pribavi_email,args=(user["primljene_transakcije"],False))
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+       
+        return jsonify(user)
+        
     else:
         return "Trazeni korisnik ne postoji", 400
+
+def pribavi_email(lista,poslate):
+    with app.app_context():
+        for t in lista:
+            if poslate:
+                user=User.query.filter_by(id=t['primalac_id']).first()
+                t["primalac_id"]=user.email
+            else:
+                user=User.query.filter_by(id=t['posiljalac_id']).first()
+                t["posiljalac_id"]=user.email
+        return lista
 
 ## privremene metode
 @app.route('/dodaj_usera', methods=['POST'])
@@ -247,7 +269,7 @@ def proces_transakcija(cc):
                 for s in primalac['stanja']:
                     if s['valuta'] == transakcija['valuta']:
                         s['stanje'] += transakcija['iznos']
-                        cc.send(stanje)
+                        cc.send(s)
                         kraj = False
                 
                 if kraj:
@@ -256,8 +278,14 @@ def proces_transakcija(cc):
                     primalac['stanja'].append(novo_stanje)
             else:
                 transakcija['stanje'] = "ODBIJENO"
+                novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=-1)
+                cc.send(StanjeSchema().dump(novo_stanje))
+                cc.send(StanjeSchema().dump(novo_stanje))
         else:
             transakcija['stanje'] = "ODBIJENO"
+            novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=-1)
+            cc.send(StanjeSchema().dump(novo_stanje))
+            cc.send(StanjeSchema().dump(novo_stanje))
 
         cc.send(transakcija)
     

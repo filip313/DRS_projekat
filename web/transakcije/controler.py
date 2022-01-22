@@ -1,5 +1,5 @@
 from transakcije import *
-from transakcije.forme import UplataForm, PrenosForm,Pretraga1Form,Pretraga2Form
+from transakcije.forme import UplataForm, PrenosForm
 from urllib import request as req
 from urllib.error import HTTPError
 import json
@@ -69,77 +69,20 @@ def prenos():
     else:
         redirect(url_for('user.login'))
 
-def popuni_formu(form,list):
-    izbor={}
-    for t in list:
-         izbor[t['valuta']]=t['valuta']
-                
-    form.valuta.choices= [(k, v) for k, v in izbor.items()]
-    form.valuta.choices.insert(0,("","   "))
-    form.stanje.choices=[("","  "),("OBRADA","OBRADA"),("OBRADJENO","OBRADJENO"),("ODBIJENO","ODBIJENO")]  
 
-
-def pretrazi(form,list,flag):
-    pretraga_pr=[]
-    for t in list:
-        if form.valuta.data != "":
-            if form.valuta.data== t['valuta']:
-                 pretraga_pr.append(t)
-            else:
-                    pretraga_pr.append(t)
-    if form.stanje.data !="":
-        pretraga_pr = [t for t in pretraga_pr if t['stanje'] == form.stanje.data]
-    if form.email.data !="":
-        if flag:
-            pretraga_pr = [t for t in pretraga_pr if form.email.data in t['posiljalac_id']]
-        else:
-            pretraga_pr = [t for t in pretraga_pr if form.email.data in t['primalac_id']]
-    return pretraga_pr
-
-@transakcije.route('/prikaz', methods=['GET','POST'])
+@transakcije.route('/prikaz', methods=['GET'])
 def prikaz_transakcija():
     if 'user' in session:
-        primljene_form=Pretraga2Form()
-        poslate_form=Pretraga1Form()
-        
         if request.method=='GET':
             try:
                 ret = req.urlopen(f'http://localhost:5000/transakcije/{session["user"]["id"]}')
                 user = json.loads(ret.read())
                 session['user'] = user
-                popuni_formu(primljene_form,user['primljene_transakcije'])
-                popuni_formu(poslate_form,user['poslate_transakcije'])
-                return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'],form_pr=primljene_form,form_po=poslate_form)
+                return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'])
             except HTTPError as e:
                 flash(e.read().decode(), category='danger')
                 return redirect(url_for('index'))
-        else:
-            if primljene_form.submit2.data:
-                print(type(primljene_form.valuta.data),flush=True)
-                user=session['user']
-                pretraga_pr=[]
-                for t in user['primljene_transakcije']:
-                    if primljene_form.valuta.data != "":
-                        if primljene_form.valuta.data== t['valuta']:
-                            pretraga_pr.append(t)
-                        else:
-                                pretraga_pr.append(t)
-                if primljene_form.stanje.data !="":
-                    pretraga_pr = [t for t in pretraga_pr if t['stanje'] == primljene_form.stanje.data]
-                if primljene_form.email.data !="":
-                    pretraga_pr = [t for t in pretraga_pr if primljene_form.email.data in t['posiljalac_id']]
-                   
-                            
-                popuni_formu(primljene_form,user['primljene_transakcije'])
-                popuni_formu(poslate_form,user['poslate_transakcije'])
-                return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=pretraga_pr,form_pr=primljene_form,form_po=poslate_form)
-
-            elif poslate_form.submit1.data:
-                user=session['user']
-                pretraga_pr=pretrazi(poslate_form,user['poslate_transakcije'],False)
-                popuni_formu(primljene_form,user['primljene_transakcije'])
-                popuni_formu(poslate_form,user['poslate_transakcije'])
-                return render_template('transakcije.html', poslate=pretraga_pr, primljene=user['primljene_transakcije'],form_pr=primljene_form,form_po=poslate_form)
+        
     else:
         return redirect(url_for('user.login'))
 

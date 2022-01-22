@@ -14,8 +14,14 @@ class PrenosForm(FlaskForm):
     iznos = FloatField(label="Iznos: ", validators=[DataRequired()])
     submit = SubmitField(label="Posalji korisniku")
 
-class PretragaForm(FlaskForm):
+class Pretraga1Form(FlaskForm):
     valuta=SelectField(label="Valuta: ")
     stanje=SelectField(label="Stanje: ")
     email=StringField(label="Email: ")
-    submit=SubmitField(label="Pretrazi: ")
+    submit1=SubmitField(label="Pretrazi: ")
+
+class Pretraga2Form(FlaskForm):
+    valuta=SelectField(label="Valuta: ")
+    stanje=SelectField(label="Stanje: ")
+    email=StringField(label="Email: ")
+    submit2=SubmitField(label="Pretrazi: ")

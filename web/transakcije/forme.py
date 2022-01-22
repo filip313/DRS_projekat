@@ -13,3 +13,7 @@ class PrenosForm(FlaskForm):
     valuta = SelectField(label="Valuta: ", validators=[DataRequired()])
     iznos = FloatField(label="Iznos: ", validators=[DataRequired()])
     submit = SubmitField(label="Posalji korisniku")
+
+class KupovinaForm(FlaskForm):
+    kolicina=FloatField(label="Kolicina: ",validators=[DataRequired()])
+    submit=SubmitField(label="Kupi")

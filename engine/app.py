@@ -3,7 +3,7 @@ from model import db, ma, pc, cc
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema, StanjeTransakcije
-from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq
+from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq,KupovinaSchema
 import datetime
 from time import sleep
 import threading
@@ -129,7 +129,7 @@ def uplata():
 @app.route('/prenos', methods=['POST'])
 def prenos():
     data = TransakcijaSchemaReq().load(request.get_json())
-    if data["valuta"] == "RSD":
+    if data["valuta"] == "USD":
         return "Ne vazeca valuta!", 400
     if data['posiljalac'] == data['primalac']:
         return 'Nije moguce izvrsiti prenos samom sebi!', 400
@@ -206,6 +206,36 @@ def pribavi_email(lista,poslate):
                 user=User.query.filter_by(id=t['posiljalac_id']).first()
                 t["posiljalac_id"]=user.email
         return lista
+
+@app.route('/kupovina',methods=['POST'])
+def kupovina():
+    data = KupovinaSchema().load(request.get_json())
+    user=User.query.filter_by(email=data['email']).first()
+    if user:
+        cena=data['kolicina']*data['vrednost']
+        stanje_usd=None
+        for s in user.stanja:
+            if s.valuta=="USD":
+                stanje_usd=s
+                break
+        if stanje_usd and stanje_usd.stanje >= cena:
+            stanje_usd.stanje-=cena
+            kraj=True
+            for s in user.stanja:
+                if s.valuta==data['valuta']:
+                    s.stanje+=data['kolicina']
+                    kraj=False
+                    break
+            if kraj:
+                user.stanja.append(Stanje(data['valuta'],data['kolicina'],user.id,None))
+            
+            db.session.commit()
+            return jsonify(UserSchema().dump(user))
+        else:
+            return "Nema dovoljno sredstava!",402
+    else:
+        return "Korisnik ne postoji",400
+
 
 ## privremene metode
 @app.route('/dodaj_usera', methods=['POST'])

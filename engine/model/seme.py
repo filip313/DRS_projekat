@@ -19,3 +19,9 @@ class TransakcijaSchemaReq(Schema):
     primalac = fields.Email()
     valuta = fields.String()
     iznos = fields.Number()
+
+class KupovinaSchema(Schema):
+    email=fields.Email()
+    valuta=fields.String()
+    kolicina=fields.Number()
+    vrednost=fields.Number()

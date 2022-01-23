@@ -1,5 +1,5 @@
 from numbers import Number
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
 from flask_wtf import FlaskForm
 from user.modeli import User
@@ -58,3 +58,9 @@ class KarticaForm(FlaskForm):
     datumIsteka = StringField(label='Datum isteka:  ', validators=[Length(min=5, max=5),DataRequired()])
     kod = StringField(label='Sigurnosni kod: ',validators=[Length(min=3,max=3),DataRequired()])
     submit = SubmitField(label='Verifikuj')
+
+
+class ZamenaForm(FlaskForm):
+    kolicina = FloatField(label="Kolicina: ", validators=[DataRequired()])
+    valuta_posle = SelectField(label="Valuta: ", validators=[])
+    submit = SubmitField(label="Zameni")

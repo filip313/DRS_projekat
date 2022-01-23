@@ -3,33 +3,44 @@
 Kupovina
 {% endblock %}
 {% block content %}
-<body>
-    <p>
-        <table id="coin">
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>Ime</th>
-                    <th>Cena</th>
-                    <th>Opcije</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in tabela %}
-                {% include 'includes/kupovina_modal.html' %}
-                    <tr>
-                        <td>{{ t['symbol'] }}</td>
-                        <td>{{ t['name'] }}</td>
-                        <td>{{ t['current_price'] }}</td>
-                        <td>
-                            <button class="btn btn-outline btn-success" data-toggle="modal"
-                            data-target="#Modal-PurchaseConfirm-{{ t['symbol']}}">Kupi</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-    </p>>
+<body style="background-color: #e9ecef;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="jumbotron text-center">
+                    <h1>Pregled i kupovina coin-a</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="coin" class="table table-stripped table-dark">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Ime</th>
+                            <th>Cena</th>
+                            <th>Opcije</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in tabela %}
+                        {% include 'includes/kupovina_modal.html' %}
+                        <tr>
+                            <td>{{ t['symbol'] }}</td>
+                            <td>{{ t['name'] }}</td>
+                            <td>{{ t['current_price'] }}</td>
+                            <td>
+                                <button class="btn btn-outline btn-success" data-toggle="modal"
+                                    data-target="#Modal-PurchaseConfirm-{{ t['symbol']}}">Kupi</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </body>
 {% endblock %}

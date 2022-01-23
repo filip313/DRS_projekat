@@ -3,7 +3,7 @@ from model import db, ma, pc, cc
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema, StanjeTransakcije
-from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq,KupovinaSchema
+from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq,KupovinaSchema, ZamenaSchema
 import datetime
 from time import sleep
 import threading
@@ -58,7 +58,6 @@ def login():
 def change_user():
     user = UserSchema().load(request.get_json())
     db_user = User.query.filter_by(id=user.id , email=user.email).first()
-
     if db_user:
         try:
             db_user.ime = user.ime
@@ -237,6 +236,44 @@ def kupovina():
         return "Korisnik ne postoji",400
 
 
+@app.route('/zamena', methods=['POST'])
+def zamena():
+    data = ZamenaSchema().dump(request.get_json()) 
+    user = User.query.filter_by(email=data['email']).first()
+   
+    if user:
+        stanje_pre = None
+        stanje_posle = None
+        for s in user.stanja:
+            if s.valuta == data['valuta_pre']:
+                stanje_pre = s
+            
+            if s.valuta == data['valuta_posle']:
+                stanje_posle = s
+        print(data['kolicina'], flush=True)
+        print(stanje_pre.stanje, flush=True)
+        if stanje_pre:
+            if stanje_pre.stanje >= data['kolicina']:
+                za_zamenu = data['kolicina'] * data['cena_pre']
+                zamenjeno = za_zamenu / data['cena_posle']
+                stanje_pre.stanje -= data['kolicina']
+
+                if stanje_posle:
+                    stanje_posle.stanje += zamenjeno
+                else:
+                    user.stanja.append(Stanje(data['valuta_posle'], zamenjeno, user.id, None))
+
+                db.session.commit()
+                return jsonify(UserSchema().dump(user))
+            else:
+                return 'Nemate dovoljno sredstava za zamenu!', 400
+        else:
+            return 'Nemate zeljeno stanje za zamenu!', 400
+    else:
+        return "Korisnik ne postoji!", 403
+            
+
+            
 ## privremene metode
 @app.route('/dodaj_usera', methods=['POST'])
 def dodaj_usera():

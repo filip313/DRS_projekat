@@ -3,22 +3,48 @@
 Uvid stanja
 {% endblock %}
 {% block content %}
-<body>
-    <table>
-        <thead>
-            <th>Id</th>
-            <th>Valuta</th>
-            <th>Stanje</th>
-        </thead>
-        <tbody>
-            {% for stanje in stanja %}
-                <tr>
-                    <td>{{ stanje['id'] }}</td>
-                    <td>{{ stanje['valuta'] }}</td>
-                    <td>{{ stanje['stanje'] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<body style="background-color: #e9ecef ; ">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+        <div class="jumbotron text-center ">
+            <h1>Prikaz svih valuta</h1>
+        </div>
+        </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <table class="table table-stripped table-dark">
+                    <thead class="thead-dark">
+                        <tr>
+                        <th>Id</th>
+                        <th>Valuta</th>
+                        <th>Stanje</th>
+                        <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stanje in stanja %}
+                        {% include 'includes/zamena_modal.html' %}
+                            <tr>
+                                <td>{{ stanje['id'] }}</td>
+                                <td>{{ stanje['valuta'] }}</td>
+                                <td>{{ stanje['stanje'] }}</td>
+                                <td>
+                                    {% if stanje['valuta'] != "USD" %}
+                                    <button class="btn btn-outline btn-success" data-toggle="modal"
+                                    data-target="#Modal-ZamenaConfirm-{{ stanje['valuta']}}">Zamena</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+    
 </body>
 {% endblock %}

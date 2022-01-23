@@ -24,15 +24,15 @@ def uplata():
                     return redirect(url_for("user.stanja"))
                 except HTTPError as e:
                     flash(e.read().decode(),category='danger')
-                    return render_template("uplata.html",form=form)
+                    return render_template("uplata.html",form=form, ulogovan=True)
             
             if form.errors != {}:
                 for msg in form.errors.values():
                     flash(msg.pop(), category='danger')
 
-                return render_template('uplata.html', form=form)
+                return render_template('uplata.html', form=form, ulogovan=True)
         else:
-            return render_template("uplata.html",form=form)
+            return render_template("uplata.html",form=form, ulogovan=True)
     else:
         return redirect(url_for("user.login"))
 
@@ -59,14 +59,14 @@ def prenos():
                     return redirect(url_for('transakcije.prikaz_transakcija'))
                 except HTTPError as e:
                     flash(e.read().decode(), category='danger')
-                    return render_template('prenos.html', form=form)
+                    return render_template('prenos.html', form=form, ulogovan=True)
             
             if form.errors != {}:
                 for msg in form.errors.values():
                     flash(msg.pop(), category='danger')
-                return render_template('prenos.html', form=form)
+                return render_template('prenos.html', form=form, ulogovan=True)
         else:
-            return render_template('prenos.html', form=form)
+            return render_template('prenos.html', form=form, ulogovan=True)
     else:
         redirect(url_for('user.login'))
 
@@ -79,7 +79,7 @@ def prikaz_transakcija():
                 ret = req.urlopen(f'http://localhost:5000/transakcije/{session["user"]["id"]}')
                 user = json.loads(ret.read())
                 session['user'] = user
-                return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'])
+                return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'], ulogovan=True)
             except HTTPError as e:
                 flash(e.read().decode(), category='danger')
                 return redirect(url_for('index'))
@@ -93,7 +93,7 @@ def kupovina():
         form=KupovinaForm()
         tabela=coin.get_coins_markets(vs_currency="usd")
         if request.method=='GET':
-               return render_template('kupovina.html',tabela=tabela,form=form)
+               return render_template('kupovina.html',tabela=tabela,form=form, ulogovan=True)
         else:
             if form.validate_on_submit():
                 valuta=request.form.get('symbol')
@@ -110,12 +110,12 @@ def kupovina():
                     return redirect(url_for('user.stanja'))
                 except HTTPError as e:
                     flash(e.read().decode(), category='danger')
-                    return render_template('kupovina.html',tabela=tabela, form=form)
+                    return render_template('kupovina.html',tabela=tabela, form=form, ulogovan=True)
             
             if form.errors != {}:
                 for msg in form.errors.values():
                     flash(msg.pop(), category='danger')
-                return render_template('kupovina.html',tabela=tabela, form=form)
+                return render_template('kupovina.html',tabela=tabela, form=form, ulogovan=True)
     else:
         return redirect(url_for('user.login'))
 

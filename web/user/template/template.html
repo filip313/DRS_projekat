@@ -1,30 +1,95 @@
 <!DOCTYPE html>
+
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/bootstrap.min.css">
     <title>{% block title %}{% endblock %}</title>
 </head>
+
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    <button type="button" class="m1-2 mb-1 close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">
-                        &times;
-                        </span>
-                    </button>
-                    {{ message }}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Početna</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {% if ulogovan %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Nalog 
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for('user.change_user') }}">Promeni podatke</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for('user.stanja') }}">Pregled stanja</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for('user.verifikacija') }}">Verifikuj nalog</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Transakcije 
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for('transakcije.prikaz_transakcija') }}">Prikaz transakcija</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ url_for('transakcije.prenos') }}">Izvrsi transakciju</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('transakcije.uplata') }}">Uplata sredstava</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('transakcije.kupovina') }}">Kupi kripto</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            {% if ulogovan %}
+                <ul class="navbar-nav navbar-right">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info" href="{{ url_for('user.logout') }}">Izloguj se </a>
+                    </li>
+                </ul>
+            {% else %}
+            <div class="btn-group">
+                <ul class="navbar-nav navbar-right">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info" href="{{ url_for('user.login') }}">Uloguj se </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info" href="{{ url_for('user.register') }}">Registruj se </a>
+                    </li>
+
+                </ul>
                 </div>
-            {% endfor %}
-        {% endif %}
+            {% endif %}
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        <button type="button" class="m1-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">
+                &times;
+            </span>
+        </button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
-    <script src='https://kit.fontawesome.com/a076d05399.js%27%3E'></script>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-    
+    <script src="static/jquery-3.6.0.min.js"></script>
+    <script src="static/popper.min.js"></script>
+    <script src="static/bootstrap.min.js"></script>
+
 </body>
 {% block content %}
 {% endblock %}

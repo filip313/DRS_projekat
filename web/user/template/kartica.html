@@ -3,22 +3,36 @@
 Verifikacija kartice
 {% endblock %}
 {% block content %}
-<body>
-    <form method="POST" class="form-Kartica">
-        {{ form.hidden_tag() }}
-        {{ form.ime.label() }}
-        {{ form.ime(class="form-control")}}
-        <br>
-        {{ form.brojKartice.label() }}
-        {{ form.brojKartice(class="form-control", placeholder="")}}
-        <br>    
-        {{ form.datumIsteka.label() }}
-        {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
-        <br>
-        {{ form.kod.label() }}
-        {{ form.kod(class="form-control", placeholder="")}}
-        <br>
-        {{ form.submit() }}
-    </form>
+
+<body style="background-color: #c9c9c9;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                <div class="panel panel-default" style="padding:5%;margin:15%">
+                    <div class="panel-body" style="border-radius: 25px; padding:5%; background-color: whitesmoke;">
+                        <form method="POST" class="form-Kartica">
+                            {{ form.hidden_tag() }}
+                            {{ form.ime.label() }}
+                            {{ form.ime(class="form-control")}}
+                            <br>
+                            {{ form.brojKartice.label() }}
+                            {{ form.brojKartice(class="form-control", placeholder="")}}
+                            <br>    
+                            {{ form.datumIsteka.label() }}
+                            {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
+                            <br>
+                            {{ form.kod.label() }}
+                            {{ form.kod(class="form-control", placeholder="")}}
+                            <br>
+                            {{ form.submit(class="form-control btn-info") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
+
 </body>
 {% endblock %}

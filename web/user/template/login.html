@@ -3,16 +3,29 @@
 Logovanje
 {% endblock %}
 {% block content %}
-<body>
-    <form method="POST" class="form-login">
-        {{ form.hidden_tag() }}
-        {{ form.email.label() }}
-        {{ form.email(class="form-control", placeholder="Email")}}
-        <br>
-        {{ form.password.label() }}
-        {{ form.password(class="form-control", placeholder="")}}
-        <br>      
-        {{ form.submit() }}
-    </form>
+
+<body style="background-color: #c9c9c9;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4" style="padding-top:20%; ">
+                <div class="panel panel-default">
+                    <div class="panel-body" style="background-color: whitesmoke; border-radius: 25px; padding:5%">
+                        <form method="POST" class="form-login">
+                            {{ form.hidden_tag() }}
+                            {{ form.email.label() }}
+                            {{ form.email(class="form-control", placeholder="Email")}}
+                            <br>
+                            {{ form.password.label() }}
+                            {{ form.password(class="form-control", placeholder="")}}
+                            <br>
+                            {{ form.submit(class="form-control btn-info") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+    </div>
 </body>
 {% endblock %}

@@ -3,25 +3,39 @@
 Uplata
 {% endblock %}
 {% block content %}
-<body>
-    <form method="POST" class="form-Uplata">
-        {{ form.hidden_tag() }}
-        {{ form.ime.label() }}
-        {{ form.ime(class="form-control")}}
-        <br>
-        {{ form.brojKartice.label() }}
-        {{ form.brojKartice(class="form-control", placeholder="")}}
-        <br>    
-        {{ form.datumIsteka.label() }}
-        {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
-        <br>
-        {{ form.kod.label() }}
-        {{ form.kod(class="form-control", placeholder="")}}
-        <br>
-        {{ form.stanje.label() }}
-        {{ form.stanje(class="form-control", placeholder="")}}
-        <br>
-        {{ form.submit() }}
-    </form>
+<body style="background-color: #e9ecef;">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="jumbotron text-center">
+                    <h1>Uplaćivanje sredstava na online račun</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="POST" class="form-Uplata">
+                    {{ form.hidden_tag() }}
+                    {{ form.ime.label() }}
+                    {{ form.ime(class="form-control")}}
+                    <br>
+                    {{ form.brojKartice.label() }}
+                    {{ form.brojKartice(class="form-control", placeholder="")}}
+                    <br>    
+                    {{ form.datumIsteka.label() }}
+                    {{ form.datumIsteka(class="form-control", placeholder="mm/yy")}}
+                    <br>
+                    {{ form.kod.label() }}
+                    {{ form.kod(class="form-control", placeholder="")}}
+                    <br>
+                    {{ form.stanje.label() }}
+                    {{ form.stanje(class="form-control", placeholder="")}}
+                    <br>
+                    {{ form.submit(class="form-control btn-info") }}
+                </form>
+            </div>
+        </div>
+    </div>
+    
 </body>
 {% endblock %}

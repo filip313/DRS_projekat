@@ -1,0 +1,35 @@
+{% extends 'template.html' %}
+{% block title%}
+Kupovina
+{% endblock %}
+{% block content %}
+<body>
+    <p>
+        <table id="coin">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Ime</th>
+                    <th>Cena</th>
+                    <th>Opcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tabela %}
+                {% include 'includes/kupovina_modal.html' %}
+                    <tr>
+                        <td>{{ t['symbol'] }}</td>
+                        <td>{{ t['name'] }}</td>
+                        <td>{{ t['current_price'] }}</td>
+                        <td>
+                            <button class="btn btn-outline btn-success" data-toggle="modal"
+                            data-target="#Modal-PurchaseConfirm-{{ t['symbol']}}">Kupi</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </p>>
+</body>
+{% endblock %}

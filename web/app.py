@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for 
 from user.controler import user
 from transakcije.controler import transakcije
+import os
 
 
 app=Flask(__name__)
@@ -14,4 +15,5 @@ def index():
     return redirect(url_for('user.index'))
 
 if __name__=="__main__":
-    app.run(debug=True,port=5001)
+    port=int(os.environ.get('PORT',5001))
+    app.run(debug=True,port=port,host='0.0.0.0')

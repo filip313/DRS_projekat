@@ -9,6 +9,8 @@ import json
 from urllib.error import HTTPError
 from transakcije import coin
 
+adresa="http://localhost:5000"
+
 @user.route("/register",methods=["GET","POST"])
 
 def register():
@@ -19,7 +21,7 @@ def register():
             data=UserSchema().dump(user)
             data.pop('id')
             data = jsonify(data).get_data()
-            zahtev = req.Request("http://localhost:5000/register")
+            zahtev = req.Request(f"{adresa}/register")
             zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
             zahtev.add_header('Content-Length', len(data))
             try:
@@ -49,7 +51,7 @@ def login():
         if form.validate_on_submit():
             logovanje=LoginSchema().load({"email":form.email.data,"password":form.password.data})
             data = jsonify(logovanje).get_data()
-            zahtev = req.Request("http://localhost:5000/login")
+            zahtev = req.Request(f"{adresa}/login")
             zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
             zahtev.add_header('Content-Length', len(data))
             try:
@@ -94,7 +96,7 @@ def change_user():
                 user.id = session['user']['id']
                 data=UserSchema().dump(user)
                 data = jsonify(data).get_data()
-                zahtev = req.Request("http://localhost:5000/change_user")
+                zahtev = req.Request(f"{adresa}/change_user")
                 zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                 zahtev.add_header('Content-Length', len(data))
                 try:
@@ -153,7 +155,7 @@ def stanja():
                     data = {'email':session['user']['email'], 'kolicina':form.kolicina.data, 'valuta_pre':request.form.get('valuta_pre'),
                         'valuta_posle':form.valuta_posle.data, "cena_pre":cena_pre, 'cena_posle':cena_posle}
                     data = jsonify(data).get_data()
-                    zahtev = req.Request("http://localhost:5000/zamena")
+                    zahtev = req.Request(f"{adresa}/zamena")
                     zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                     zahtev.add_header('Content-Length', len(data))
                     try:
@@ -182,7 +184,7 @@ def verifikacija():
                 if form.validate_on_submit():
                     data={"ime":form.ime.data,"brojKartice":form.brojKartice.data,"datumIsteka":form.datumIsteka.data,"kod":form.kod.data,"email":session["user"]['email']} 
                     data = jsonify(data).get_data()
-                    zahtev = req.Request("http://localhost:5000/verifikacija")
+                    zahtev = req.Request(f"{adresa}/verifikacija")
                     zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                     zahtev.add_header('Content-Length', len(data))
                     try:
@@ -194,7 +196,7 @@ def verifikacija():
                         return redirect(url_for("user.verifikacija"))
 
                     flash(ret.read().decode(),category='primary')
-                    return redirect(url_for("user.verifikacija"))
+                    return redirect(url_for("user.index"))
                 if form.errors != {}:
                     for msg in form.errors.values():
                         flash(msg.pop(), category='danger')

@@ -11,6 +11,7 @@ import threading
 from multiprocessing import Process
 from sha3 import keccak_256
 from random import random 
+import os
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@localhost/baza'
@@ -361,4 +362,5 @@ def proces_transakcija(cc):
 if __name__ == "__main__":
     p = Process(target=proces_transakcija, args=(cc,))
     p.start()
-    app.run(debug=True)
+    port=int(os.environ.get('PORT',5000))
+    app.run(debug=True,port=port,host='0.0.0.0')

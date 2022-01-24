@@ -5,6 +5,8 @@ from urllib.error import HTTPError
 import json
 
 
+adresa="http://localhost:5000"
+
 @transakcije.route("/uplata",methods=["GET","POST"])
 def uplata():
     form=UplataForm()
@@ -13,7 +15,7 @@ def uplata():
             if form.validate_on_submit():
                 data={"ime":form.ime.data,"brojKartice":form.brojKartice.data,"datumIsteka":form.datumIsteka.data,"kod":form.kod.data,"email":session["user"]['email'],"stanje":form.stanje.data} 
                 data = jsonify(data).get_data()
-                zahtev = req.Request("http://localhost:5000/uplata")
+                zahtev = req.Request(f"{adresa}/uplata")
                 zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                 zahtev.add_header('Content-Length', len(data))
                 try:
@@ -50,7 +52,7 @@ def prenos():
             if form.validate_on_submit():
                 data={"posiljalac":session['user']['email'], "primalac":form.primalac.data, "valuta":form.valuta.data, "iznos":form.iznos.data}
                 data = jsonify(data).get_data()
-                zahtev = req.Request("http://localhost:5000/prenos")
+                zahtev = req.Request(f"{adresa}/prenos")
                 zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                 zahtev.add_header('Content-Length', len(data))
                 try:
@@ -76,7 +78,7 @@ def prikaz_transakcija():
     if 'user' in session:
         if request.method=='GET':
             try:
-                ret = req.urlopen(f'http://localhost:5000/transakcije/{session["user"]["id"]}')
+                ret = req.urlopen(f'{adresa}/transakcije/{session["user"]["id"]}')
                 user = json.loads(ret.read())
                 session['user'] = user
                 return render_template('transakcije.html', poslate=user['poslate_transakcije'], primljene=user['primljene_transakcije'], ulogovan=True)
@@ -100,7 +102,7 @@ def kupovina():
                 cena=request.form.get('cena')
                 data={'email':session['user']['email'],'valuta':valuta,'kolicina':form.kolicina.data,'vrednost':cena}
                 data = jsonify(data).get_data()
-                zahtev = req.Request("http://localhost:5000/kupovina")
+                zahtev = req.Request(f"{adresa}/kupovina")
                 zahtev.add_header('Content-Type', 'application/json; charset=utf-8')
                 zahtev.add_header('Content-Length', len(data))
                 try:

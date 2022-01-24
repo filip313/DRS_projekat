@@ -1,5 +1,5 @@
 from dataclasses import field
-from user.forme import KarticaForm
+from user.forme.dodatneforme import KarticaForm
 from wtforms import StringField, PasswordField, SubmitField,IntegerField, SelectField, FloatField ,HiddenField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
 from flask_wtf import FlaskForm

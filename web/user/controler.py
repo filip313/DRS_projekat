@@ -1,7 +1,9 @@
-from ctypes.wintypes import ULONG
 from user import *
-from user.forme import KarticaForm, LoginForm, RegisterForm, ChangeForm, ZamenaForm
-from user.modeli import UserSchema,User,LoginSchema
+from user.forme.dodatneforme import *
+from user.forme.userforme import *
+from user.modeli.usermodeli import *
+from user.modeli.transakcijamodel import *
+from user.modeli.stanjemodel import *
 from urllib import request as req, parse 
 import json
 from urllib.error import HTTPError

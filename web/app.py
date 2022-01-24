@@ -1,6 +1,5 @@
 from flask import Flask, redirect, url_for 
 from user.controler import user
-from user.modeli import User
 from transakcije.controler import transakcije
 
 

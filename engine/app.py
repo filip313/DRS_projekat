@@ -3,7 +3,8 @@ from model import db, ma, pc, cc
 from model.user import User, UserSchema
 from model.stanje import Stanje, StanjeSchema
 from model.transakcija import Transakcija, TransakcijaSchema, StanjeTransakcije
-from model.seme import LoginSchema, UplataSchema, VerifikacijaSchema, TransakcijaSchemaReq,KupovinaSchema, ZamenaSchema
+from model.seme.transakcijasema import *
+from model.seme.usersema import *
 import datetime
 from time import sleep
 import threading

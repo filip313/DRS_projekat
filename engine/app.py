@@ -19,6 +19,8 @@ app.config['SECRET_KEY'] = '123'
 db.init_app(app)
 ma.init_app(app)
 
+lock = threading.Lock()
+
 @app.route('/')
 def index():
     users = User.query.all()
@@ -149,6 +151,7 @@ def prenos():
 
 def obrada_transakcija(pos_em, prim_em, t_id):
     with app.app_context():
+        lock.acquire()
         posiljalac = User.query.filter_by(email=pos_em).first()
         primalac = User.query.filter_by(email=prim_em).first()
         transakcija = Transakcija.query.filter_by(id=t_id).first()
@@ -156,8 +159,10 @@ def obrada_transakcija(pos_em, prim_em, t_id):
         pc.send(UserSchema().dump(primalac))
         pc.send(TransakcijaSchema().dump(transakcija)) 
         pos_stanje= StanjeSchema().load(pc.recv())
-        prim_stanje = StanjeSchema().load(pc.recv())
+        prim_stanje = pc.recv()
         t= TransakcijaSchema().load(pc.recv())
+        posiljalac = User.query.filter_by(email=pos_em).first()
+        primalac = User.query.filter_by(email=prim_em).first()
         transakcija.hash_id = t.hash_id
         transakcija.stanje = t.stanje
         if pos_stanje.id != -1:
@@ -168,15 +173,16 @@ def obrada_transakcija(pos_em, prim_em, t_id):
                     kraj = False
             if kraj:
                 posiljalac.stanja.append(pos_stanje)
-        if prim_stanje.id != -1:
+        if 'id' not in prim_stanje:
             kraj = True
             for s in primalac.stanja:
-                if s.valuta == prim_stanje.valuta:
-                    s.stanje = prim_stanje.stanje
+                if s.valuta == prim_stanje['valuta']:
+                    s.stanje = prim_stanje['stanje']
                     kraj = False
             if kraj:
-                primalac.stanja.append(prim_stanje)
+                primalac.stanja.append(Stanje(prim_stanje['valuta'], prim_stanje['stanje'], primalac.id, None))
         db.session.commit()
+        lock.release()
 
 
 @app.route('/transakcije/<user_id>', methods=['GET'])
@@ -339,18 +345,20 @@ def proces_transakcija(cc):
                 for s in primalac['stanja']:
                     if s['valuta'] == transakcija['valuta']:
                         s['stanje'] += transakcija['iznos']
+                        s = {'stanje':s['stanje'], 'user_id':s['user_id'], 'valuta':s['valuta']}
                         cc.send(s)
                         kraj = False
                 
                 if kraj:
-                    novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=0)
-                    cc.send(StanjeSchema().dump(novo_stanje))
+                    novo_stanje = {'stanje':transakcija['iznos'], 'user_id': primalac['id'], 'valuta':transakcija['valuta']}
+                    cc.send(novo_stanje)
                     primalac['stanja'].append(novo_stanje)
             else:
                 transakcija['stanje'] = "ODBIJENO"
                 novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=-1)
-                cc.send(StanjeSchema().dump(novo_stanje))
-                cc.send(StanjeSchema().dump(novo_stanje))
+                novo_stanje = {'stanje':transakcija['iznos'], 'user_id': primalac['id'], 'valuta':transakcija['valuta'], 'id':-1}
+                cc.send(novo_stanje)
+                cc.send(novo_stanje)
         else:
             transakcija['stanje'] = "ODBIJENO"
             novo_stanje = Stanje( stanje=transakcija['iznos'], user_id=primalac['id'], valuta=transakcija['valuta'], id=-1)

@@ -181,6 +181,7 @@ def obrada_transakcija(pos_em, prim_em, t_id):
 
 @app.route('/transakcije/<user_id>', methods=['GET'])
 def get_sve_transakcije(user_id):
+    user_id = float(user_id)
     user = User.query.filter_by(id=user_id).first()
     if user:
         user.password = ""

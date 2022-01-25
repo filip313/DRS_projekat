@@ -16,8 +16,8 @@ class Transakcija(db.Model):
     iznos = db.Column(db.Float, nullable=False)
     provizija = db.Column(db.Float, nullable=False)
     valuta = db.Column(db.String(10), nullable=False)
-    primalac_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    posiljalac_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    primalac_id = db.Column(db.Integer, db.ForeignKey('useri.id'))
+    posiljalac_id = db.Column(db.Integer, db.ForeignKey('useri.id'))
     stanje = db.Column(db.Enum(StanjeTransakcije), nullable=False)
 
     def __init__(self, posiljalac_id, primalac_id, iznos, provizija, valuta, hash_id, stanje, id):

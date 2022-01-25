@@ -14,7 +14,7 @@ from random import random
 import os
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:flask@localhost/baza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ndissgnadnzmkv:30d37d5b811610d66d650e0caec30a9e0854eb6d5a70865e754fa27b3eeef95b@ec2-34-194-171-47.compute-1.amazonaws.com:5432/d6dlguqq0jhh8q'
 app.config['SECRET_KEY'] = '123'
 db.init_app(app)
 ma.init_app(app)
@@ -212,7 +212,7 @@ def pribavi_email(lista,poslate):
 def kupovina():
     data = KupovinaSchema().load(request.get_json())
     user=User.query.filter_by(email=data['email']).first()
-    if user:
+    if user and user.verifikovan:
         cena=data['kolicina']*data['vrednost']
         stanje_usd=None
         for s in user.stanja:
@@ -235,7 +235,7 @@ def kupovina():
         else:
             return "Nema dovoljno sredstava!",402
     else:
-        return "Korisnik ne postoji",400
+        return "Korisnik ne postoji ili nije verifikovan",400
 
 
 @app.route('/zamena', methods=['POST'])
@@ -243,7 +243,7 @@ def zamena():
     data = ZamenaSchema().dump(request.get_json()) 
     user = User.query.filter_by(email=data['email']).first()
    
-    if user:
+    if user and user.verifikovan:
         stanje_pre = None
         stanje_posle = None
         for s in user.stanja:
@@ -272,7 +272,7 @@ def zamena():
         else:
             return 'Nemate zeljeno stanje za zamenu!', 400
     else:
-        return "Korisnik ne postoji!", 403
+        return "Korisnik ne postoji ili nije verifikovan!", 403
             
 
             
@@ -317,7 +317,7 @@ def proces_transakcija(cc):
         posiljalac = cc.recv()
         primalac = cc.recv()
         transakcija = cc.recv()
-        sleep(5)
+        sleep(300)
         str_za_hash = posiljalac['email'] + primalac['email'] + str(transakcija['iznos']) + str(random())
         k = keccak_256()
         k.update(bytes(str_za_hash, 'utf-8'))
@@ -363,4 +363,4 @@ if __name__ == "__main__":
     p = Process(target=proces_transakcija, args=(cc,))
     p.start()
     port=int(os.environ.get('PORT',5000))
-    app.run(debug=True,port=port,host='0.0.0.0')
+    app.run(debug=False,port=port,host='0.0.0.0')

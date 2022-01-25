@@ -7,7 +7,7 @@ class Stanje(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     valuta = db.Column(db.String(10), nullable=False)
     stanje = db.Column(db.Float, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('useri.id'))
 
 
     def __init__(self, valuta, stanje, user_id, id):

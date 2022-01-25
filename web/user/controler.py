@@ -9,7 +9,7 @@ import json
 from urllib.error import HTTPError
 from transakcije import coin
 
-adresa="http://localhost:5000"
+adresa="http://drs-engine.herokuapp.com"
 
 @user.route("/register",methods=["GET","POST"])
 

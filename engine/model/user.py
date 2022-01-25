@@ -6,7 +6,7 @@ from marshmallow import Schema, fields, post_load
 
 
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'useri'
     id = db.Column(db.Integer, primary_key=True)
     ime = db.Column(db.String(32), nullable=False)
     prezime = db.Column(db.String(32), nullable=False)

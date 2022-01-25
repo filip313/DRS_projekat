@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 import json
 
 
-adresa="http://localhost:5000"
+adresa="http://drs-engine.herokuapp.com"
 
 @transakcije.route("/uplata",methods=["GET","POST"])
 def uplata():
